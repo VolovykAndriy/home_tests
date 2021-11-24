@@ -93,8 +93,10 @@ def get_available_letters(letters_guessed):
 
 def check_input(letter, warnings, letters_guessed, hint_check=0):
     '''
-    Check is this letter in guessed, or is it avillible.
-    Check amount of warnings and ect.
+    letter: symbol that we checking
+    warnings: amount of warnings
+    letters_guessed: list (of letters), which letters have been guessed so far
+    hint_check: marker fot hangman_with_hints
     '''
     if letter == "*" and hint_check:
         return False
@@ -297,28 +299,28 @@ def show_possible_matches(my_word):
 def hangman_with_hints(secret_word):
     '''
     secret_word: string, the secret word to guess.
-    
+
     Starts up an interactive game of Hangman.
-    
+
     * At the start of the game, let the user know how many 
       letters the secret_word contains and how many guesses s/he starts with.
-      
+
     * The user should start with 6 guesses
-    
+
     * Before each round, you should display to the user how many guesses
       s/he has left and the letters that the user has not yet guessed.
-    
+
     * Ask the user to supply one guess per round. Make sure to check that the user guesses a letter
-      
+
     * The user should receive feedback immediately after each guess 
       about whether their guess appears in the computer's word.
 
     * After each guess, you should display to the user the 
       partially guessed word so far.
-      
+
     * If the guess is the symbol *, print out all words in wordlist that
       matches the current guessed word. 
-    
+
     Follows the other limitations detailed in the problem write-up.
     '''
     guesses = 6
@@ -352,7 +354,7 @@ def hangman_with_hints(secret_word):
                 )
                 letter = input("Please guess a letter: ").lower()
                 warning_check = False
-                if not check_input(letter, warnings, letters_guessed):
+                if not check_input(letter, warnings, letters_guessed, 1):
                     break
                 else:
                     warnings -= 1
