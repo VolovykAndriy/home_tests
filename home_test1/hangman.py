@@ -75,34 +75,52 @@ def get_available_letters(letters_guessed):
 def check_input(letter, warnings, letters_guessed, hint_check=0):
     if letter == "*" and hint_check:
         return False
-    elif not letter.isalpha() or len(letter) != 1:
-        warnings -= 1
-        if warnings < 0:
-            print(
-                "Oops! That is not a valid letter."
-                "You have no warnings left so you lose one guess: "
-                f"{get_guessed_word(secret_word, letters_guessed)}"
-            )
-        else:
-            print(
-                "Oops! That is not a valid letter."
-                f"You have {warnings} warnings left: "
-                f"{get_guessed_word(secret_word, letters_guessed)}"
-            )
-        return True
     elif letter.isalpha() and letter in letters_guessed:
         if warnings < 0:
             print(
-                "Oops! You've already guessed that letter."
+                "Oops! You've already guessed that letter. "
                 "You have no warnings left so you lose one guess: "
-                f"{get_guessed_word(secret_word, letters_guessed)}"
+                f"{get_guessed_word(secret_word, letters_guessed)}\n"
+                "---------------------------------------------------------------"
+            )
+        elif warnings == 0:
+            print(
+                "Oops! You've already guessed that letter. "
+                "You have no warnings left, next time you will lose 1 guess: "
+                f"{get_guessed_word(secret_word, letters_guessed)}\n"
+                "---------------------------------------------------------------"
             )
         else:
             warnings -= 1
             print(
-                "Oops! You've already guessed that letter."
-                f"You have {warnings} warnings left:\n"
-                f"{get_guessed_word(secret_word, letters_guessed)}"
+                "Oops! You've already guessed that letter. "
+                f"You have {warnings} warnings left: "
+                f"{get_guessed_word(secret_word, letters_guessed)}\n"
+                "---------------------------------------------------------------"
+            )
+        return True
+    elif not letter.isalpha() or len(letter) != 1 or letter not in get_available_letters(letters_guessed):
+        warnings -= 1
+        if warnings < 0:
+            print(
+                "Oops! That is not a valid letter. "
+                "You have no warnings left so you lose one guess: "
+                f"{get_guessed_word(secret_word, letters_guessed)}\n"
+                "---------------------------------------------------------------"
+            )
+        elif warnings == 0:
+            print(
+                "Oops! That is not a valid letter. "
+                "You have no warnings left, next time you will lose 1 guess: "
+                f"{get_guessed_word(secret_word, letters_guessed)}\n"
+                "---------------------------------------------------------------"
+            )
+        else:
+            print(
+                "Oops! That is not a valid letter. "
+                f"You have {warnings} warnings left: "
+                f"{get_guessed_word(secret_word, letters_guessed)}\n"
+                "-----------------------------------"
             )
         return True
     return False
@@ -115,15 +133,11 @@ def hangman(secret_word):
     print(
         "Welcome to the game Hangman!\n"
         f"I am thinking of a word that is {len(secret_word)} letters long\n"
-        "-------------"
+        "---------------------------------------------------------------"
     )
     while True:
         if guesses <= 0:
             guesses = 0
-        print(
-            f"You have {guesses} guesses left\n"
-            f"Available letters: {get_available_letters(letters_guessed)}"
-        )
         if is_word_guessed(secret_word, letters_guessed):
             print(
                 "Congratulations, you won!\n"
@@ -133,20 +147,26 @@ def hangman(secret_word):
             break
         elif not guesses:
             print(
-                "GAME OVER!\n"
-                "Try your luck in the next game.\n"
-                f"Your word was {secret_word}"
+                "Sorry, you ran out of guesses.\n"
+                f"The word was {secret_word}"
             )
             break
         else:
             while True:
+                print(
+                    f"You have {guesses} guesses left\n"
+                    f"Available letters: {get_available_letters(letters_guessed)}"
+                )
                 letter = input("Please guess a letter: ").lower()
+                warning_check = False
                 if not check_input(letter, warnings, letters_guessed):
                     break
                 else:
                     warnings -= 1
                     if warnings < 0:
                         guesses -= 1
+                        warning_check = True
+                        break
                     continue
             letters_guessed.append(letter)
             if letters_guessed[-1] in secret_word:
@@ -154,6 +174,8 @@ def hangman(secret_word):
                     "Good guess: "
                     f"{get_guessed_word(secret_word, letters_guessed)}"
                 )
+            elif warning_check:
+                continue
             else:
                 print(
                     "Oops! That letter is not in my word: "
@@ -163,7 +185,7 @@ def hangman(secret_word):
                     guesses -= 1
                 elif letter in "aeiou":
                     guesses -= 2
-            print("-----------")
+            print("---------------------------------------------------------------")
 
 
 # When you've completed your hangman function, scroll down to the bottom
@@ -215,7 +237,7 @@ def hangman_with_hints(secret_word):
     print(
         "Welcome to the game Hangman!\n"
         f"I am thinking of a word that is {len(secret_word)} letters long\n"
-        "-------------"
+        "---------------------------------------------------------------"
     )
     while True:
         if is_word_guessed(secret_word, letters_guessed):
@@ -228,25 +250,26 @@ def hangman_with_hints(secret_word):
         elif guesses <= 0:
             guesses = 0
             print(
-                f"You have {guesses} guesses left\n"
-                "GAME OVER!\n"
-                "Try your luck in the next game.\n"
-                f"Your word was: {secret_word}"
+                "Sorry, you ran out of guesses.\n"
+                f"The word was {secret_word}"
             )
             break
         else:
-            print(
-                f"You have {guesses} guesses left\n"
-                f"Available letters: {get_available_letters(letters_guessed)}"
-            )
             while True:
+                print(
+                    f"You have {guesses} guesses left\n"
+                    f"Available letters: {get_available_letters(letters_guessed)}"
+                )
                 letter = input("Please guess a letter: ").lower()
-                if not check_input(letter, warnings, letters_guessed, 1):
+                warning_check = False
+                if not check_input(letter, warnings, letters_guessed):
                     break
                 else:
                     warnings -= 1
                     if warnings < 0:
                         guesses -= 1
+                        warning_check = True
+                        break
                     continue
             if letter == "*":
                 show_possible_matches(
@@ -259,6 +282,8 @@ def hangman_with_hints(secret_word):
                     "Good guess:"
                     f"{get_guessed_word(secret_word, letters_guessed)}"
                 )
+            elif warning_check:
+                continue
             else:
                 print(
                     "Oops! That letter is not in my word: "
@@ -268,7 +293,7 @@ def hangman_with_hints(secret_word):
                     guesses -= 1
                 elif letter in "aeiou":
                     guesses -= 2
-            print("-----------")
+            print("---------------------------------------------------------------")
 
 # When you've completed your hangman_with_hint function, comment the two similar
 # lines above that were used to run the hangman function, and then uncomment
